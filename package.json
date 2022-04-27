@@ -1,0 +1,31 @@
+{
+  "name": "@hexlet/code",
+  "version": "0.1.0",
+  "description": "RSS aggregator from Hexlet cources",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivan-fedoroff/frontend-project-lvl3.git"
+  },
+  "keywords": [
+    "Frontend",
+    "WebPack",
+    "Bootstrap",
+    "RSS"
+  ],
+  "author": "Ivan Fedorov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ivan-fedoroff/frontend-project-lvl3/issues"
+  },
+  "homepage": "https://github.com/ivan-fedoroff/frontend-project-lvl3#readme",
+  "devDependencies": {
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}
