@@ -4,6 +4,9 @@ install: # установка зависимостей
 lint: # проверка кода
 		npx eslint .
 
+test:
+	npm test -s
+
 develop:
 		npx webpack serve
 

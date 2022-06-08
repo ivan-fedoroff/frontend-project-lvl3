@@ -1,10 +1,13 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 // const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
 // const isProduction = process.env.NODE_ENV === 'production';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const config = {
   mode: process.env.NODE_ENV || 'development',
@@ -46,7 +49,7 @@ const config = {
   },
 };
 
-module.exports = () => config;
+export default () => config;
 /* {
   if (isProduction) {
     config.mode = 'production';
