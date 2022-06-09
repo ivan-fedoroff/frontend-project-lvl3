@@ -5,6 +5,6 @@ export default {
       errorURL: 'Ссылка должна быть валидным URL',
       errorDouble: 'RSS уже существует',
       success: 'RSS успешно загружен',
-    }
-  }
-}
+    },
+  },
+};

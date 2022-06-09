@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import app from '../src/app.js';
 
 const user = userEvent.setup();
-
+const url = 'https://ru.hexlet.io/lessons.rss';
 let elements;
 
 beforeEach(() => {
@@ -29,78 +29,78 @@ beforeEach(() => {
   };
 });
 
+test('success adding', () => {
+  expect(elements.feedback).toBeEmptyDOMElement();
+  expect(elements.input).not.toHaveClass('is-invalid');
+
+  const promise = user.type(elements.input, url)
+    .then(() => user.click(elements.button))
+    .then(() => {
+      expect(elements.feedback).toHaveTextContent('RSS успешно загружен');
+      expect(elements.feedback).toHaveClass('text-success');
+      expect(elements.input).not.toHaveClass('is-invalid');
+      expect(elements.input).not.toHaveValue();
+      expect(elements.input).toHaveFocus();
+    });
+  return promise;
+});
+
 test('empty field', () => {
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
-  
-  user.click(elements.button)
-    .then(() => {
-      expect(elements.input).toHaveClass('is-invalid');
-      expect(elements.feedback).toHaveTextContent('Пожалуйста, заполните поле');
-      expect(elements.feedback).toHaveClass('text-danger');
-    });
+
+  const promise = user.click(elements.button).then(() => {
+    expect(elements.input).toHaveClass('is-invalid');
+    expect(elements.feedback).toHaveTextContent('Пожалуйста, заполните поле');
+    expect(elements.feedback).toHaveClass('text-danger');
+  });
+  return promise;
 });
 
 test('wrong url', () => {
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
 
-  user.type(elements.input, 'wrong url')
+  const promise = user.type(elements.input, 'wrong url')
+    .then(() => user.click(elements.button))
     .then(() => {
-      user.click(elements.button);
-    })
-    .then(() => {
-      expect(elements.input).toHaveClass('is-invalid');
       expect(elements.feedback).toHaveTextContent('Ссылка должна быть валидным URL');
       expect(elements.feedback).toHaveClass('text-danger');
-    })
+      expect(elements.input).toHaveClass('is-invalid');
+    });
+  return promise;
 });
 
-test('success add from init state and add same url', () => {
+test('success adding after error', () => {
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
 
-  userEvent.type(elements.input, 'https://ru.hexlet.io/lessons.rss')
-    .then(() => {
-      user.click(elements.button);
-    })
+  const promise = user.click(elements.button)
+    .then(() => user.type(elements.input, url))
+    .then(() => user.click(elements.button))
     .then(() => {
       expect(elements.feedback).toHaveTextContent('RSS успешно загружен');
       expect(elements.feedback).toHaveClass('text-success');
       expect(elements.input).not.toHaveClass('is-invalid');
       expect(elements.input).not.toHaveValue();
       expect(elements.input).toHaveFocus();
-    })
-    .then(() => {
-      user.type(elements.input, 'https://ru.hexlet.io/lessons.rss')
-    })
-    .then(() => {
-      user.click(elements.button);
-    })
+    });
+  return promise;
+});
+
+test('dublicate error', () => {
+  expect(elements.feedback).toBeEmptyDOMElement();
+  expect(elements.input).not.toHaveClass('is-invalid');
+
+  const promise = user.type(elements.input, url)
+    .then(() => user.click(elements.button))
+    .then(() => user.clear(elements.input))
+    .then(() => user.type(elements.input, url))
+    .then(() => user.click(elements.button))
     .then(() => {
       expect(elements.input).toHaveClass('is-invalid');
       expect(elements.feedback).toHaveTextContent('RSS уже существует');
       expect(elements.feedback).toHaveClass('text-danger');
-    })
-})
-
-test('success add after error', () => {
-  expect(elements.feedback).toBeEmptyDOMElement();
-  expect(elements.input).not.toHaveClass('is-invalid');
-
-  user.click(elements.button)
-    .then(() => {
-      user.type(elements.input, 'https://ru.hexlet.io/lessons.rss')
-    })
-    .then(() => {
-      user.click(elements.button)
-    })
-    .then(() => {
-      expect(elements.feedback).toHaveTextContent('RSS успешно загружен');
-      expect(elements.feedback).toHaveClass('text-success');
-      expect(elements.input).not.toHaveClass('is-invalid');
-      expect(elements.input).not.toHaveValue();
-      expect(elements.input).toHaveFocus();
-    })
-})
-
+    });
+  return promise;
+});
