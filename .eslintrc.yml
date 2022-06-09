@@ -7,7 +7,7 @@ env:
 extends: 
   - eslint:recommended
   - airbnb-base
-  - plugin:testing-library
+  - plugin:testing-library/recommended
   - plugin:jest-dom/recommended
 parserOptions:
   ecmaVersion: latest

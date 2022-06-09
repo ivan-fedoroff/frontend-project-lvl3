@@ -56,6 +56,7 @@
     "webpack-dev-server": "^4.8.1"
   },
   "dependencies": {
+    "i18next": "^21.8.9",
     "npm-check-updates": "^12.5.11",
     "on-change": "^4.0.0",
     "yup": "^0.32.11"

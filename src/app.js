@@ -1,19 +1,46 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
+import i18n from 'i18next';
 import render from './render.js';
+import ru from './locales/ru.js';
 
-const validate = (field, data) => {
+const validate = (field, data, i18Inst) => {
+  yup.setLocale({
+    string: {
+      required: ({ required }) => ({ key: 'feedback.errorEmpty', values: { required } }),
+      url: ({ url }) => ({ key: 'feedback.errorURL', values: { url }}),
+      notOneOf: ({ notOneOf }) => ({ key: 'feedback.errorDouble', values: { notOneOf } }),
+    }
+  });
+
   const schema = yup.string()
-    .required('Пожалуйста, заполните поле')
-    .url('Ссылка должна быть валидным URL')
-    .notOneOf(data, 'RSS уже существует');
+    .required()
+    .url()
+    .notOneOf(data);
   return schema.validate(field, { abortEarly: false })
     .then(() => '')
     .catch((e) => {
-      const [message] = e.errors;
+      const [message] = e.errors.map((err) => i18Inst.t(err.key));
       return message;
     });
 };
+
+const clickHandler = (watchedState, state, i18Inst) => (e) => {
+  e.preventDefault();
+  watchedState.rssForm.link = elements.field.value;
+  validate(watchedState.rssForm.link, state.data, i18Inst)
+    .then((error) => {
+      console.log(error);
+      if (!error) {
+        watchedState.data.push(watchedState.rssForm.link);
+        watchedState.rssForm.feedback = i18Inst.t('feedback.success');
+        watchedState.rssForm.processState = 'success';
+      } else {
+        watchedState.rssForm.feedback = error;
+        watchedState.rssForm.processState = 'error';
+        }
+    });
+}
 
 const app = () => {
   const elements = {
@@ -25,31 +52,23 @@ const app = () => {
   const state = {
     data: [],
     rssForm: {
-      processState: 'filling',
-      valid: true,
-      error: '',
+      processState: 'success',
+      feedback: '',
       link: '',
     },
   };
 
   const watchedState = onChange(state, render(elements));
 
-  elements.button.addEventListener('click', (e) => {
-    e.preventDefault();
-    watchedState.rssForm.field = elements.field.value;
-    validate(watchedState.rssForm.field, state.data)
-      .then((error) => {
-        watchedState.rssForm.error = error;
-        watchedState.rssForm.valid = !error;
-
-        if (watchedState.rssForm.valid) {
-          state.data.push(watchedState.rssForm.field);
-          watchedState.rssForm.processState = 'success';
-        } else {
-          watchedState.rssForm.processState = 'error';
-        }
-      });
-  });
+  const i18Inst = i18n.createInstance();
+  i18Inst.init({
+    lng: 'ru',
+    debug: false,
+    resources: {ru},
+  })
+    .then(() => {
+      elements.button.addEventListener('click', clickHandler(watchedState, state, i18Inst));
+    })
 };
 
 export default app;
