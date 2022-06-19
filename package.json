@@ -15,7 +15,9 @@
     "serve": "webpack serve"
   },
   "jest": {
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "testTimeout": 20000,
+    "setupFilesAfterEnv": ["/home/vladtepesh/pet-project/frontend-project-lvl3/setup.jest.js"]
   },
   "repository": {
     "type": "git",
@@ -49,6 +51,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
+    "nock": "^13.2.7",
     "sass": "^1.51.0",
     "sass-loader": "^12.6.0",
     "style-loader": "^3.3.1",
@@ -57,6 +60,8 @@
     "webpack-dev-server": "^4.8.1"
   },
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.2",
+    "axios": "^0.27.2",
     "i18next": "^21.8.9",
     "npm-check-updates": "^12.5.11",
     "on-change": "^4.0.0",
