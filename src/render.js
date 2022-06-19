@@ -24,6 +24,38 @@ const handlerProcessState = (value, processState, elements) => {
   }
 };
 
+const createCard = () => {
+  const card = document.createElement('div');
+  card.className = 'card border-0';
+  const cardBody = document.createElement('div');
+  cardBody.className = 'card-body';
+  cardBody.innerHTML = '<h2 class="card-title h4">Посты</h2>';
+  card.append(cardBody);
+  return card;
+};
+
+const renderItems = (postItems, root) => {
+  const card = createCard();
+  const items = document.createElement('ul');
+  items.className = 'list-group border-0 rounded-0';
+  items.innerHTML = postItems.map((item) => `<li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
+    <a href=${item.url} class="fw-bold" data-id="2" target="_blank" rel="noopener noreferrer">${item.title}</a>
+    <button type="button" class="btn btn-outline-primary btn-sm" data-id="2" data-bs-toggle="modal" data-bs-target="#modal">Просмотр</button>
+  </li>`).join('\n');
+  root.append(card, items);
+};
+
+const renderFeeds = (feeds, root) => {
+  const card = createCard();
+  const items = document.createElement('ul');
+  items.className = 'list-group border-0 rounded-0';
+  items.innerHTML = feeds.map((item) => `<li class="list-group-item border-0 border-end-0">
+    <h3 class="h6 m-0">${item.title}</h3>
+    <p class="m-0 small text-black-50">${item.description}</p>
+    </li>`).join('\n');
+  root.append(card, items);
+};
+
 const render = (elements) => (path, value) => {
   const { feedback, postContainer, feedContainer } = elements;
   if (path === 'rssForm.feedback') {
@@ -35,39 +67,11 @@ const render = (elements) => (path, value) => {
   }
 
   if (path === 'data.feeds') {
-    if (value.length > 0) {
-      const card = document.createElement('div');
-      card.className = 'card border-0';
-      const cardBody = document.createElement('div');
-      cardBody.className = 'card-body';
-      cardBody.innerHTML = '<h2 class="card-title h4">Фиды</h2>';
-      card.append(cardBody);
-      const items = document.createElement('ul');
-      items.className = 'list-group border-0 rounded-0';
-      items.innerHTML = value.map((item) => `<li class="list-group-item border-0 border-end-0">
-      <h3 class="h6 m-0">${item.title}</h3>
-      <p class="m-0 small text-black-50">${item.description}</p>
-      </li>`).join('\n');
-      feedContainer.append(card, items);
-    }
+    renderFeeds(value, feedContainer);
   }
 
   if (path === 'data.items') {
-    if (value.length > 0) {
-      const card = document.createElement('div');
-      card.className = 'card border-0';
-      const cardBody = document.createElement('div');
-      cardBody.className = 'card-body';
-      cardBody.innerHTML = '<h2 class="card-title h4">Посты</h2>';
-      card.append(cardBody);
-      const items = document.createElement('ul');
-      items.className = 'list-group border-0 rounded-0';
-      items.innerHTML = value.map((item) => `<li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
-      <a href=${item.url} class="fw-bold" data-id="2" target="_blank" rel="noopener noreferrer">${item.title}</a>
-      <button type="button" class="btn btn-outline-primary btn-sm" data-id="2" data-bs-toggle="modal" data-bs-target="#modal">Просмотр</button>
-      </li>`).join('\n');
-      postContainer.append(card, items);
-    }
+    renderItems(value, postContainer);
   }
 };
 
