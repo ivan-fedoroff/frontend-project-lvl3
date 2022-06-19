@@ -1,6 +1,6 @@
 {
   "name": "@hexlet/code",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "RSS aggregator from Hexlet cources",
   "main": "src/index.js",
   "private": true,
@@ -17,7 +17,9 @@
   "jest": {
     "testEnvironment": "jsdom",
     "testTimeout": 20000,
-    "setupFilesAfterEnv": ["/home/vladtepesh/pet-project/frontend-project-lvl3/setup.jest.js"]
+    "setupFilesAfterEnv": [
+      "./setup.jest.js"
+    ]
   },
   "repository": {
     "type": "git",
@@ -60,7 +62,6 @@
     "webpack-dev-server": "^4.8.1"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.2",
     "axios": "^0.27.2",
     "i18next": "^21.8.9",
     "npm-check-updates": "^12.5.11",
