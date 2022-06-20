@@ -11,13 +11,14 @@ import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import app from '../src/app.js';
-import getGoodRss from './getGoodRss.js';
-import getBadRss from './getBadRss.js';
 
 nock.disableNetConnect();
 const user = userEvent.setup();
 const url = 'http://lorem-rss.herokuapp.com/feed?unit=day';
 let elements;
+let validRss;
+let badRss;
+// let newRss;
 
 beforeEach(() => {
   const __filename = fileURLToPath(import.meta.url);
@@ -25,6 +26,11 @@ beforeEach(() => {
   const pathToFixture = (filename) => path.join(__dirname, '__fixtures__', filename);
   const initHtml = fs.readFileSync(pathToFixture('index.html')).toString();
   document.body.innerHTML = initHtml;
+  app();
+
+  validRss = fs.readFileSync(pathToFixture('feed')).toString();
+  badRss = fs.readFileSync(pathToFixture('badFeed')).toString();
+  // newRss = fs.readFileSync(pathToFixture('newFeed')).toString();
 
   elements = {
     button: screen.getByText(/Добавить/),
@@ -34,9 +40,13 @@ beforeEach(() => {
 });
 
 test('success adding', () => {
-  app(getGoodRss);
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
+  nock('https://allorigins.hexlet.app')
+    .get((uri) => uri.includes('lorem-rss.herokuapp'))
+    .reply(200, {
+      contents: validRss,
+    });
 
   const promise = user.type(elements.input, url)
     .then(() => user.click(elements.button))
@@ -58,7 +68,6 @@ test('success adding', () => {
 });
 
 test('empty field', () => {
-  app();
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
 
@@ -71,7 +80,6 @@ test('empty field', () => {
 });
 
 test('wrong url', () => {
-  app();
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
 
@@ -86,9 +94,13 @@ test('wrong url', () => {
 });
 
 test('success adding after error', () => {
-  app(getGoodRss);
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
+  nock('https://allorigins.hexlet.app')
+    .get((uri) => uri.includes('lorem-rss.herokuapp'))
+    .reply(200, {
+      contents: validRss,
+    });
 
   const promise = user.click(elements.button)
     .then(() => user.type(elements.input, url))
@@ -106,17 +118,21 @@ test('success adding after error', () => {
 });
 
 test('dublicate error', () => {
-  app(getGoodRss);
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
+  nock('https://allorigins.hexlet.app')
+    .get((uri) => uri.includes('lorem-rss.herokuapp'))
+    .reply(200, {
+      contents: validRss,
+    });
 
   const promise = user.type(elements.input, url)
     .then(() => user.click(elements.button))
     .then(() => user.clear(elements.input))
     .then(() => user.type(elements.input, url))
     .then(() => user.click(elements.button))
+    .then(() => waitFor(() => expect(elements.input).toHaveClass('is-invalid')))
     .then(() => {
-      expect(elements.input).toHaveClass('is-invalid');
       expect(elements.feedback).toHaveTextContent('RSS уже существует');
       expect(elements.feedback).toHaveClass('text-danger');
     });
@@ -124,7 +140,6 @@ test('dublicate error', () => {
 });
 
 test('network error', () => {
-  app();
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
 
@@ -139,14 +154,18 @@ test('network error', () => {
 });
 
 test('no valid RSS', () => {
-  app(getBadRss);
   expect(elements.feedback).toBeEmptyDOMElement();
   expect(elements.input).not.toHaveClass('is-invalid');
+  nock('https://allorigins.hexlet.app')
+    .get((uri) => uri.includes('lorem-rss.herokuapp'))
+    .reply(200, {
+      contents: badRss,
+    });
 
   const promise = user.type(elements.input, url)
     .then(() => user.click(elements.button))
+    .then(() => waitFor(() => expect(elements.input).toHaveClass('is-invalid')))
     .then(() => {
-      expect(elements.input).toHaveClass('is-invalid');
       expect(elements.feedback).toHaveTextContent('Ресурс не содержит валидный RSS');
       expect(elements.feedback).toHaveClass('text-danger');
     });

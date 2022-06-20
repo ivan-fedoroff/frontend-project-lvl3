@@ -16,7 +16,6 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testTimeout": 20000,
     "setupFilesAfterEnv": [
       "./setup.jest.js"
     ]

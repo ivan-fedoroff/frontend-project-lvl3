@@ -35,6 +35,8 @@ const createCard = () => {
 };
 
 const renderItems = (postItems, root) => {
+  const container = root;
+  container.innerHTML = '';
   const card = createCard();
   const items = document.createElement('ul');
   items.className = 'list-group border-0 rounded-0';
@@ -42,10 +44,12 @@ const renderItems = (postItems, root) => {
     <a href=${item.url} class="fw-bold" data-id="2" target="_blank" rel="noopener noreferrer">${item.title}</a>
     <button type="button" class="btn btn-outline-primary btn-sm" data-id="2" data-bs-toggle="modal" data-bs-target="#modal">Просмотр</button>
   </li>`).join('\n');
-  root.append(card, items);
+  container.append(card, items);
 };
 
 const renderFeeds = (feeds, root) => {
+  const container = root;
+  container.innerHTML = '';
   const card = createCard();
   const items = document.createElement('ul');
   items.className = 'list-group border-0 rounded-0';
@@ -53,7 +57,7 @@ const renderFeeds = (feeds, root) => {
     <h3 class="h6 m-0">${item.title}</h3>
     <p class="m-0 small text-black-50">${item.description}</p>
     </li>`).join('\n');
-  root.append(card, items);
+  container.append(card, items);
 };
 
 const render = (elements) => (path, value) => {

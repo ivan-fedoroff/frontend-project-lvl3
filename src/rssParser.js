@@ -17,8 +17,8 @@ const rssParser = (data, i18Inst) => {
   const items = [];
   for (let i = 0; i < rssItems.length; i += 1) {
     const title = rssItems[i].getElementsByTagName('title')[0].textContent;
-    const description = rssItems[i].getElementsByTagName('description').textContent;
-    const url = rssItems[i].getElementsByTagName('link').textContent;
+    const description = rssItems[i].getElementsByTagName('description')[0].textContent;
+    const url = rssItems[i].getElementsByTagName('link')[0].textContent;
     items.push({ title, description, url });
   }
 
