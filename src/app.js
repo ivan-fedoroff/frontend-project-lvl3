@@ -11,26 +11,20 @@ const refreshPosts = (state, watchedState, i18Inst) => {
   const { data } = watchedState;
   setTimeout(() => {
     state.links.forEach((link) => {
-      const promis = getRSS(link, i18Inst)
-        .then((xmlData) => rssParser(xmlData, i18Inst))
+      const promis = getRSS(link.url, i18Inst)
+        .then((xmlData) => {
+          const newData = rssParser(xmlData, i18Inst);
+          return newData.items;
+        })
         .then((newData) => {
-          const { feedId } = state.data.items.find((item) => item.link === link);
-          const modifiedItems = newData.items.map((item, id) => {
-            const itemId = `${feedId}_${id + 1}`;
-            return {
-              ...item,
-              id: itemId,
-              feedId,
-              link,
-            };
-          });
-          return modifiedItems;
+          const feedId = link.id;
+          return setId(newData, feedId);
         })
         .then((modifiedItems) => {
-          const otherItems = state.data.items.filter((item) => item.link !== link);
+          const otherItems = state.data.items.filter((item) => item.feedId !== link.id);
           data.items = [...modifiedItems, ...otherItems];
         })
-        .catch();
+        .catch((e) => e);
       return promis;
     });
     refreshPosts(state, watchedState, i18Inst);
@@ -45,6 +39,11 @@ const app = (client = getRSS) => {
     feedback: document.querySelector('.feedback'),
     postContainer: document.querySelector('.posts'),
     feedContainer: document.querySelector('.feeds'),
+    modal: document.getElementById('modal'),
+    modalTitle: document.querySelector('.modal-title'),
+    modalText: document.querySelector('.modal-body'),
+    modalFullArticle: document.querySelector('.full-article'),
+    modalBtnsClose: document.querySelectorAll('[data-bs-dismiss="modal"]'),
   };
 
   const state = {
@@ -58,20 +57,33 @@ const app = (client = getRSS) => {
       feedback: '',
       link: '',
     },
+    ui: {
+      watched: [],
+      modalState: 'close',
+      modalData: null,
+    },
   };
 
-  const watchedState = onChange(state, render(elements));
+  const watchedState = onChange(state, (path, value) => {
+    render(path, value, elements, watchedState, state);
+  });
 
-  const clickHandler = (i18Inst) => (e) => {
+  const addNewRSS = (i18Inst) => (e) => {
     e.preventDefault();
     const link = elements.field.value;
     watchedState.rssForm.processState = 'validate';
     validate(link, state.links, i18Inst)
       .then(() => client(link, i18Inst))
       .then((xmlData) => rssParser(xmlData, i18Inst))
-      .then((data) => setId(data, watchedState.data.feeds, link))
       .then((data) => {
-        watchedState.links.push(link);
+        const id = state.links.length + 1;
+        watchedState.links.push({ url: link, id });
+        const { items, feed } = data;
+        feed.id = id;
+        const modifiedItems = setId(items, id);
+        return { items: modifiedItems, feed };
+      })
+      .then((data) => {
         watchedState.data.feeds = [data.feed, ...watchedState.data.feeds];
         watchedState.data.items = [...data.items, ...watchedState.data.items];
         watchedState.rssForm.feedback = i18Inst.t('feedback.success');
@@ -90,9 +102,18 @@ const app = (client = getRSS) => {
     resources: { ru },
   })
     .then(() => {
-      elements.button.addEventListener('click', clickHandler(i18Inst));
+      elements.button.addEventListener('click', addNewRSS(i18Inst));
+      elements.modalBtnsClose.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          watchedState.ui.modalState = 'close';
+          watchedState.ui.modalData = null;
+        });
+      });
     })
-    .then(() => refreshPosts(state, watchedState, i18Inst));
+    .then(() => {
+      refreshPosts(state, watchedState, i18Inst);
+    });
 };
 
 export default app;
