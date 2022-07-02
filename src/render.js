@@ -38,8 +38,8 @@ const renderPost = (post, watchedState, state, i18Inst) => {
   const { ui } = watchedState;
   const { url, title, id } = post;
   const watchedIndex = state.findIndex((item) => item === title);
-  const li = document.createElement('li');
-  li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
+  const view = document.createElement('li');
+  view.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
   const postTitle = document.createElement('a');
   postTitle.href = url;
   postTitle.textContent = title;
@@ -56,8 +56,8 @@ const renderPost = (post, watchedState, state, i18Inst) => {
   button.textContent = i18Inst.t('button');
   button.addEventListener('click', addToWatched(title, ui.watched));
   button.addEventListener('click', addPostToWatch(post, ui));
-  li.append(postTitle, button);
-  return li;
+  view.append(postTitle, button);
+  return view;
 };
 
 const renderPosts = (posts, watchedState, watched, i18Inst) => {
@@ -121,21 +121,21 @@ const render = (path, value, elements, watchedState, state, i18Inst) => {
 
   if (path === 'data.feeds') {
     const card = makeCard('Feeds');
-    const feedList = renderFeeds(value);
-    feedContainer.append(card, feedList);
+    const view = renderFeeds(value);
+    feedContainer.append(card, view);
   }
 
   if (path === 'data.items') {
     postContainer.innerHTML = '';
     const card = makeCard('Posts');
-    const postList = renderPosts(value, watchedState, state.ui.watched, i18Inst);
-    postContainer.append(card, postList);
+    const view = renderPosts(value, watchedState, state.ui.watched, i18Inst);
+    postContainer.append(card, view);
   }
 
   if (path === 'ui.watched') {
     const oldPosts = postContainer.querySelector('ul');
-    const newPosts = renderPosts(state.data.items, watchedState, state.ui.watched, i18Inst);
-    postContainer.replaceChild(newPosts, oldPosts);
+    const view = renderPosts(state.data.items, watchedState, state.ui.watched, i18Inst);
+    postContainer.replaceChild(view, oldPosts);
   }
 
   if (path === 'ui.modalState') {

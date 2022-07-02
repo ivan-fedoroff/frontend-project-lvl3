@@ -21,9 +21,9 @@ let badRss;
 // let newRss;
 
 beforeEach(() => {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  const pathToFixture = (filename) => path.join(__dirname, '__fixtures__', filename);
+  const filename = fileURLToPath(import.meta.url);
+  const dirName = dirname(filename);
+  const pathToFixture = (fileName) => path.join(dirName, '__fixtures__', fileName);
   const initHtml = fs.readFileSync(pathToFixture('index.html')).toString();
   document.body.innerHTML = initHtml;
   app();

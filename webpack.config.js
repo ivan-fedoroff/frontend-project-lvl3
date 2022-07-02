@@ -6,15 +6,15 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 // const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
 // const isProduction = process.env.NODE_ENV === 'production';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirName = dirname(filename);
 
 const config = {
   mode: process.env.NODE_ENV || 'development',
   entry: './src/index.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(dirName, 'dist'),
   },
   devServer: {
     open: true,
