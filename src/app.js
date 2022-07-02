@@ -31,7 +31,35 @@ const refreshPosts = (state, watchedState, i18Inst) => {
   }, 5000);
 };
 
-const app = (client = getRSS) => {
+const addNewRSS = (i18Inst, watchedState, state, elements) => (e) => {
+  e.preventDefault();
+  const { rssForm, data } = watchedState;
+  const link = elements.field.value;
+  rssForm.processState = 'validate';
+  validate(link, state.links, i18Inst)
+    .then(() => getRSS(link, i18Inst))
+    .then((xmlData) => rssParser(xmlData, i18Inst))
+    .then((newData) => {
+      const id = state.links.length + 1;
+      watchedState.links.push({ url: link, id });
+      const { items, feed } = newData;
+      feed.id = id;
+      const modifiedItems = setId(items, id);
+      return { items: modifiedItems, feed };
+    })
+    .then((newData) => {
+      data.feeds = [newData.feed, ...data.feeds];
+      data.items = [...newData.items, ...data.items];
+      rssForm.feedback = i18Inst.t('feedback.success');
+      rssForm.processState = 'success';
+    })
+    .catch((error) => {
+      rssForm.feedback = error.message;
+      rssForm.processState = 'error';
+    });
+};
+
+const app = () => {
   const elements = {
     form: document.querySelector('form'),
     field: document.querySelector('input'),
@@ -64,34 +92,6 @@ const app = (client = getRSS) => {
     },
   };
 
-  const addNewRSS = (i18Inst, watchedState) => (e) => {
-    e.preventDefault();
-    const { rssForm, data } = watchedState;
-    const link = elements.field.value;
-    rssForm.processState = 'validate';
-    validate(link, state.links, i18Inst)
-      .then(() => client(link, i18Inst))
-      .then((xmlData) => rssParser(xmlData, i18Inst))
-      .then((newData) => {
-        const id = state.links.length + 1;
-        watchedState.links.push({ url: link, id });
-        const { items, feed } = newData;
-        feed.id = id;
-        const modifiedItems = setId(items, id);
-        return { items: modifiedItems, feed };
-      })
-      .then((newData) => {
-        data.feeds = [newData.feed, ...data.feeds];
-        data.items = [...newData.items, ...data.items];
-        rssForm.feedback = i18Inst.t('feedback.success');
-        rssForm.processState = 'success';
-      })
-      .catch((error) => {
-        rssForm.feedback = error.message;
-        rssForm.processState = 'error';
-      });
-  };
-
   const i18Inst = i18n.createInstance();
   i18Inst.init({
     lng: 'ru',
@@ -105,7 +105,7 @@ const app = (client = getRSS) => {
       return watchedState;
     })
     .then((watchedState) => {
-      elements.button.addEventListener('click', addNewRSS(i18Inst, watchedState));
+      elements.button.addEventListener('click', addNewRSS(i18Inst, watchedState, state, elements));
       elements.modalBtnsClose.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           const { ui } = watchedState;
