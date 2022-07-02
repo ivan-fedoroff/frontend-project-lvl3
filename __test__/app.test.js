@@ -18,7 +18,7 @@ const url = 'http://lorem-rss.herokuapp.com/feed?unit=day';
 let elements;
 let validRss;
 let badRss;
-let newRss;
+// let newRss;
 
 beforeEach(() => {
   const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +30,7 @@ beforeEach(() => {
 
   validRss = fs.readFileSync(pathToFixture('feed')).toString();
   badRss = fs.readFileSync(pathToFixture('badFeed')).toString();
-  newRss = fs.readFileSync(pathToFixture('newFeed')).toString();
+  // newRss = fs.readFileSync(pathToFixture('newFeed')).toString();
 
   elements = {
     button: screen.getByText(/Добавить/),
@@ -172,36 +172,3 @@ test('no valid RSS', () => {
 
   return promise;
 });
-
-/* test('success refreshing', () => {
-  nock('https://allorigins.hexlet.app')
-    .get((uri) => uri.includes('lorem-rss.herokuapp'))
-    .reply(200, {
-      contents: validRss,
-    })
-    .get((uri) => uri.includes('lorem-rss.herokuapp'))
-    .delayConnection(500)
-    .reply(200, {
-      contents: newRss,
-    })
-    .get((uri) => uri.includes('lorem-rss.herokuapp'))
-    .delayConnection(2000)
-    .reply(200, {
-      contents: newRss,
-    })
-    .get((uri) => uri.includes('lorem-rss.herokuapp'))
-    .delayConnection(3000)
-    .reply(200, {
-      contents: newRss,
-    });
-
-  const promise = user.type(elements.input, url)
-    .then(() => user.click(elements.button))
-    .then(() => waitFor(() => expect(screen.getByText('Lorem ipsum 2022-06-19T00:00:00Z'))
-      .toBeInTheDocument()))
-    .then(() => waitFor(() => expect(screen.getByText('Lorem ipsum 2022-06-20T00:00:00Z'))
-      .toBeInTheDocument()))
-    .then(() => waitFor(() => expect(screen.queryByText('Lorem ipsum 2022-06-19T00:00:00Z')).not.toBeInTheDocument()));
-
-  return promise;
-}); */
