@@ -38,8 +38,8 @@ const renderPost = (post, watchedState, state, i18Inst) => {
   const { ui } = watchedState;
   const { url, title, id } = post;
   const watchedIndex = state.findIndex((item) => item === title);
-  const view = document.createElement('li');
-  view.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
+  const li = document.createElement('li');
+  li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
   const postTitle = document.createElement('a');
   postTitle.href = url;
   postTitle.textContent = title;
@@ -56,16 +56,16 @@ const renderPost = (post, watchedState, state, i18Inst) => {
   button.textContent = i18Inst.t('button');
   button.addEventListener('click', addToWatched(title, ui.watched));
   button.addEventListener('click', addPostToWatch(post, ui));
-  view.append(postTitle, button);
-  return view;
+  li.append(postTitle, button);
+  return li;
 };
 
 const renderPosts = (posts, watchedState, watched, i18Inst) => {
   const list = document.createElement('ul');
   list.className = 'list-group border-0 rounded-0';
   posts.forEach((post) => {
-    const li = renderPost(post, watchedState, watched, i18Inst);
-    list.appendChild(li);
+    const view = renderPost(post, watchedState, watched, i18Inst);
+    list.appendChild(view);
   });
   return list;
 };
