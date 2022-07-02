@@ -34,7 +34,7 @@ const addPostToWatch = (post, uiState) => (e) => {
   ui.modalData = { url, title, description };
 };
 
-const renderPost = (post, watchedState, state) => {
+const renderPost = (post, watchedState, state, i18Inst) => {
   const { ui } = watchedState;
   const { url, title, id } = post;
   const watchedIndex = state.findIndex((item) => item === title);
@@ -53,18 +53,18 @@ const renderPost = (post, watchedState, state) => {
   button.dataset.id = id;
   button.dataset.bsToggle = 'modal';
   button.dataset.bsTarget = '#modal';
-  button.textContent = 'Просмотр';
+  button.textContent = i18Inst.t('button');
   button.addEventListener('click', addToWatched(title, ui.watched));
   button.addEventListener('click', addPostToWatch(post, ui));
   li.append(postTitle, button);
   return li;
 };
 
-const renderPosts = (posts, watchedState, watched) => {
+const renderPosts = (posts, watchedState, watched, i18Inst) => {
   const list = document.createElement('ul');
   list.className = 'list-group border-0 rounded-0';
   posts.forEach((post) => {
-    const li = renderPost(post, watchedState, watched);
+    const li = renderPost(post, watchedState, watched, i18Inst);
     list.appendChild(li);
   });
   return list;
@@ -109,7 +109,7 @@ const handlerModalData = (value, elements) => {
   }
 };
 
-const render = (path, value, elements, watchedState, state) => {
+const render = (path, value, elements, watchedState, state, i18Inst) => {
   const { feedback, postContainer, feedContainer } = elements;
   if (path === 'rssForm.feedback') {
     feedback.textContent = value;
@@ -128,13 +128,13 @@ const render = (path, value, elements, watchedState, state) => {
   if (path === 'data.items') {
     postContainer.innerHTML = '';
     const card = makeCard('Posts');
-    const postList = renderPosts(value, watchedState, state.ui.watched);
+    const postList = renderPosts(value, watchedState, state.ui.watched, i18Inst);
     postContainer.append(card, postList);
   }
 
   if (path === 'ui.watched') {
     const oldPosts = postContainer.querySelector('ul');
-    const newPosts = renderPosts(state.data.items, watchedState, state.ui.watched);
+    const newPosts = renderPosts(state.data.items, watchedState, state.ui.watched, i18Inst);
     postContainer.replaceChild(newPosts, oldPosts);
   }
 

@@ -73,7 +73,7 @@ test('empty field', () => {
 
   const promise = user.click(elements.button).then(() => {
     expect(elements.input).toHaveClass('is-invalid');
-    expect(elements.feedback).toHaveTextContent('Пожалуйста, заполните поле');
+    expect(elements.feedback).toHaveTextContent('Не должно быть пустым');
     expect(elements.feedback).toHaveClass('text-danger');
   });
   return promise;
@@ -147,7 +147,7 @@ test('network error', () => {
     .then(() => user.click(elements.button))
     .then(() => {
       expect(elements.input).toHaveClass('is-invalid');
-      expect(elements.feedback).toHaveTextContent('Ошибка сети, попробуйте еще раз');
+      expect(elements.feedback).toHaveTextContent('Ошибка сети');
       expect(elements.feedback).toHaveClass('text-danger');
     });
   return promise;

@@ -64,34 +64,31 @@ const app = (client = getRSS) => {
     },
   };
 
-  const watchedState = onChange(state, (path, value) => {
-    render(path, value, elements, watchedState, state);
-  });
-
-  const addNewRSS = (i18Inst) => (e) => {
+  const addNewRSS = (i18Inst, watchedState) => (e) => {
     e.preventDefault();
+    const { rssForm, data } = watchedState;
     const link = elements.field.value;
-    watchedState.rssForm.processState = 'validate';
+    rssForm.processState = 'validate';
     validate(link, state.links, i18Inst)
       .then(() => client(link, i18Inst))
       .then((xmlData) => rssParser(xmlData, i18Inst))
-      .then((data) => {
+      .then((newData) => {
         const id = state.links.length + 1;
         watchedState.links.push({ url: link, id });
-        const { items, feed } = data;
+        const { items, feed } = newData;
         feed.id = id;
         const modifiedItems = setId(items, id);
         return { items: modifiedItems, feed };
       })
-      .then((data) => {
-        watchedState.data.feeds = [data.feed, ...watchedState.data.feeds];
-        watchedState.data.items = [...data.items, ...watchedState.data.items];
-        watchedState.rssForm.feedback = i18Inst.t('feedback.success');
-        watchedState.rssForm.processState = 'success';
+      .then((newData) => {
+        data.feeds = [newData.feed, ...data.feeds];
+        data.items = [...newData.items, ...data.items];
+        rssForm.feedback = i18Inst.t('feedback.success');
+        rssForm.processState = 'success';
       })
       .catch((error) => {
-        watchedState.rssForm.feedback = error.message;
-        watchedState.rssForm.processState = 'error';
+        rssForm.feedback = error.message;
+        rssForm.processState = 'error';
       });
   };
 
@@ -102,16 +99,24 @@ const app = (client = getRSS) => {
     resources: { ru },
   })
     .then(() => {
-      elements.button.addEventListener('click', addNewRSS(i18Inst));
+      const watchedState = onChange(state, (path, value) => {
+        render(path, value, elements, watchedState, state, i18Inst);
+      });
+      return watchedState;
+    })
+    .then((watchedState) => {
+      elements.button.addEventListener('click', addNewRSS(i18Inst, watchedState));
       elements.modalBtnsClose.forEach((btn) => {
         btn.addEventListener('click', (e) => {
+          const { ui } = watchedState;
           e.preventDefault();
-          watchedState.ui.modalState = 'close';
-          watchedState.ui.modalData = null;
+          ui.modalState = 'close';
+          ui.modalData = null;
         });
       });
+      return watchedState;
     })
-    .then(() => {
+    .then((watchedState) => {
       refreshPosts(state, watchedState, i18Inst);
     });
 };
