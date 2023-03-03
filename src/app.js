@@ -11,7 +11,7 @@ const refreshPosts = (state, watchedState, i18Inst) => {
   const { data } = watchedState;
   setTimeout(() => {
     state.links.forEach((link) => {
-      const promis = getRSS(link.url, i18Inst)
+      const promise = getRSS(link.url, i18Inst)
         .then((xmlData) => {
           const newData = rssParser(xmlData, i18Inst);
           return newData.items;
@@ -25,7 +25,7 @@ const refreshPosts = (state, watchedState, i18Inst) => {
           data.items = [...modifiedItems, ...otherItems];
         })
         .catch((e) => e);
-      return promis;
+      return promise;
     });
     refreshPosts(state, watchedState, i18Inst);
   }, 5000);
